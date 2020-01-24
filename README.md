@@ -1,5 +1,5 @@
 These scripts have been written by Timo Riikonen.
-If you enhance these, I would appreciate if you would send you improvements to me: timo.riikonen@tieto.com
+If you enhance these, I would appreciate if you would send you improvements to me.
 Copyright: GNU Lesser General Public License, https://www.gnu.org/licenses/lgpl-3.0.en.html
 
 What this does:
@@ -13,9 +13,24 @@ REQUIREMENTS
 - MS SQL Server 2008+
 
 
-INSTALLATION
-1) Add following columns to all databases:
-	[lastUpdate] [datetime2](7) NULL,
+DEVELOPMENT INSTALLATION
+1) Create database "ShortTermDatabaseName". I suggest that you use this name for now, then you can execute other parts without changing them.
+2) Create database "LongTermDatabaseName". I suggest that you use this name for now, then you can execute other parts without changing them.
+3) Execute 00 DEV ONLY Create short term database tables.sql against both ShortTermDatabaseName and LongTermDatabaseName
+4) Execute 02 lastUpdate trigger example.sql against ShortTermDatabaseName 
+5) Execute 03 tableCreateCopyTimestamps.sql against LongTermDatabaseName 
+6) Execute 04 cumulativeCopy.sql against ShortTermDatabaseName
+7) Add data to ShortTermDatabaseName
+8) Execute 04 cumulativeCopy.sql against ShortTermDatabaseName
+
+
+PRODUCTION INSTALLATION
+1) If you will create a full duplica of your original database, then create a script that creates (at least) tables
+
+2) create LongTermDatabaseName database and create tables on it.
+
+1) Add manually in SSMS following columns to all tables in ShortTermDatabaseName by using Design on each table:
+	lastUpdate [datetime2](7) NULL,
 We have tested this with SQL Server 2014 replication: Adding this column does not affect existing replication and replication will maintain this field.
 If you already have a similar field, it should work either 99.9% or 100%, need to think about that more.
 
@@ -42,17 +57,13 @@ You must insert all columns in the script.
 It is best to execute this manually on first time.
 This script gives as output the time range that you just copied.
 
-6) Create a job to execute script 04 periodically. For a 100GB ShortTermDatabaseName database, this script took less than a minute to execute. 
-Time was same whether the script did nothing or had data to copy.
+6) Create a job to execute script 04 periodically. For a 7GB ShortTermDatabaseName database, this script took 7 seconds to execute when there was nothing to update and 14 seconds with updates.
+
 
 
 BUGS AND DEVELOPMENT NEEDS
-1) These scripts are complex to alter and thus it is error prone to use these.
-2) When you get new columns, this script will still work except values for these new columns are not copied to LongTermDatabaseName.
-2A) Script to make an error if number of columns is higher than before. Add this script either to the  beginning of script 04 or as a separate step in the 
-job.
-2B) Script to copy these values in retrospect. Note: this works perfectly only for the time duration of the ShortTermDatabaseName.
-2C) Alter the script so that column names are read automatically and thus fix issues 1 & 2.
-3) There is no error handling in script 04. 
-AFAIK this script doesn't need it, but perhaps there is a situation where it would be useful.
-
+1) These scripts are complex to alter and thus it is error prone to use these: Alter the script so that column names are read automatically
+2) Script to copy these values in retrospect. Note: this works perfectly only for the time duration of the ShortTermDatabaseName.
+3) There is no error handling in script 04. This means that when the database schema changes, the whole copy operation will fail from that point onwards (or from the beginning?).
+4) Job to clean old data from the cumulative database.
+5) Script example for triggering deletions.

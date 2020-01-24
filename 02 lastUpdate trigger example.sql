@@ -34,12 +34,12 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for trigger here
-	UPDATE [InsertTable1NameToHere] SET lastUpdate = GetDate() FROM [InsertTable1NameToHere] u INNER JOIN Inserted i ON u.InsertIdColumnToHere = i.InsertIdColumnToHere 
+	UPDATE [InsertTable1NameToHere] SET lastUpdate = GetDate() FROM [InsertTable1NameToHere] u INNER JOIN Inserted i ON u.[InsertTable1NameToHereKeyColumn] = i.[InsertTable1NameToHereKeyColumn] 
 
 END
 GO
 
-UPDATE [InsertTable2NameToHere] SET lastUpdate = GetDate() WHERE lastUpdate IS NULL
+UPDATE [InsertTable1NameToHere] SET lastUpdate = GetDate() WHERE lastUpdate IS NULL
 GO
 
 
@@ -53,16 +53,16 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for trigger here
-	UPDATE [InsertTable2NameToHere] SET lastUpdate = GetDate() FROM [InsertTable2NameToHere] u INNER JOIN Inserted i ON u.InsertIdColumnToHere = i.InsertIdColumnToHere 
+	UPDATE [InsertTable2NameToHere] SET lastUpdate = GetDate() FROM [InsertTable2NameToHere] u INNER JOIN Inserted i ON u.[InsertTable2NameToHereKeyColumn] = i.[InsertTable2NameToHereKeyColumn] 
 
 END
 GO
 
-UPDATE [InsertTable3NameToHereLastUpdate] SET lastUpdate = GetDate() WHERE lastUpdate IS NULL
+UPDATE [InsertTable2NameToHere] SET lastUpdate = GetDate() WHERE lastUpdate IS NULL
 GO
 
 CREATE TRIGGER dbo.InsertTable3NameToHereLastUpdateLastUpdate
-   ON  dbo.InsertTable3NameToHereLastUpdate
+   ON  dbo.[InsertTable3NameToHere]
    AFTER UPDATE,INSERT
 AS 
 BEGIN
@@ -71,7 +71,10 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for trigger here
-	UPDATE [InsertTable3NameToHereLastUpdate] SET lastUpdate = GetDate() FROM [InsertTable3NameToHereLastUpdate] u INNER JOIN Inserted i ON u.InsertIdColumnToHere = i.InsertIdColumnToHere 
+	UPDATE [InsertTable3NameToHere] SET lastUpdate = GetDate() FROM [InsertTable3NameToHere] u INNER JOIN Inserted i ON u.[InsertTable3NameToHereKeyColumn] = i.[InsertTable3NameToHereKeyColumn] 
 
 END
+GO
+
+UPDATE [InsertTable3NameToHere] SET lastUpdate = GetDate() WHERE lastUpdate IS NULL
 GO
